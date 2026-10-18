@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+  <meta name="viewport" content="width=device-width">
+  <title>a website</title>
+  <link rel="stylesheet" href="Style.css">
+</>
+<body>
+  <header class="header">
+    Welcome to my portfolio!
+    <div class="icon">
+      <img src="Images/menu.png" alt="icon">
+    </div>
+  </header>
+
+  <div class="bg">
+    <div class="Gif1">
+      <img src="Images/giphy (4).gif" alt="Gif1">
+      <span class="tap-label">Tap me 👆</span>
+    </div>
+    <div class="Gif2">
+      <img src="Images/giphy (2).gif" alt="Gif2">
+      <span class="tap-label">Tap me 👆</span>
+    </div>
+    <div class="Gif3">
+      <img src="Images/giphy (1).gif" alt="Gif3">
+      <span class="tap-label">Tap me 👆</span>
+    </div>
+      <div class="button">
+  <button class="btn">click me!🤪</button>
+
+    <div id="note-container">
+<p id="note"></p>
+</div>
+
+
+<canvas id="mazePaper" width="300" height="300"></canvas>
+  </div>
+
+<!-- WIN OVERLAY - hidden at start -->
+<div id="winScreen">
+  <div class="winBox">
+    <h1>U WIN 🥳🥳</h1>
+    <p>You found the gift! Anya is happy 🌸🎁</p>
+    <button onclick="resetGame()">Play Again</button>
+  </div>
+</div>
+    
+<script>
+const boxes = document.querySelectorAll('.Gif1, .Gif2, .Gif3');
+
+boxes.forEach(box => {
+  box.style.cursor = "pointer";
+  box.addEventListener('click', function() {
+    this.classList.add('zoomed');
+    setTimeout(() => {
+      this.classList.remove('zoomed');
+    }, 3000);
+  });
+});
+
+// TYPEWRITER - BUTTON CENTERED + NOTE BELOW
+const btn = document.querySelector('.btn');
+const noteContainer = document.getElementById('note-container');
+const noteEl = document.getElementById('note');
+const message = `Boom 💥😁..hluuu to u 🤗🤗 u're are good person 🥰 but only from heart cause u don't have dimaag 😜😜😜....bhagoo 😱😨💨💨..wait look down 👇`;
+let isTyping = false;
+
+
+
+btn.addEventListener('click', function() {
+  if(isTyping) return;
+  noteContainer.style.display = "block";
+  noteEl.textContent = "";
+  let i = 0;
+  isTyping = true;
+  function type(){
+    if(i < message.length){
+      noteEl.textContent += message.charAt(i);
+      i++;
+      setTimeout(type, 40);
+    } else {
+      isTyping = false;
+      // SHOW MAZE AFTER NOTE - this is the part you deleted
+      const mazeEl = document.getElementById('mazePaper');
+      mazeEl.style.display = "block";
+      setTimeout(()=>{
+        mazeEl.classList.add('show');
+        mazeEl.scrollIntoView({behavior: "smooth"});
+      }, 400);
+    }
+  }
+  type();
+});
+
+
+// 3. MAZE - FIXED 10x10 COMPLETE
+const canvas = document.getElementById('mazePaper');
+const ctx = canvas.getContext('2d');
+const boxSize = 30;
+const maze = [
+  [1,0,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,1,0,0,1],
+  [1,1,1,0,1,0,1,1,0,1],
+  [1,0,0,0,1,0,0,0,0,1],
+  [1,0,1,1,1,1,1,0,1,1],
+  [1,0,0,0,0,0,1,0,0,1],
+  [1,1,1,1,0,1,1,1,0,1],
+  [1,0,0,0,0,1,0,0,0,1],
+  [1,0,1,1,0,0,0,1,0,1],
+  [1,1,1,1,1,1,1,1,0,2]
+];
+let playerX = 1;
+let playerY = 0;
+let isDragging = false;
+
+function drawMaze(){
+  ctx.clearRect(0,0,300,300);
+  ctx.strokeStyle = "green";
+  ctx.lineWidth = 3;
+  for(let y=0; y<10; y++){
+    for(let x=0; x<10; x++){
+      if(maze[y][x] === 1){
+        ctx.strokeRect(x*boxSize, y*boxSize, boxSize, boxSize);
+      }
+      if(maze[y][x] === 2){
+        ctx.font = "20px serif";
+        ctx.fillText("🎁", x*boxSize+2, y*boxSize+22);
+      }
+    }
+  }
+  ctx.font = "20px serif";
+  ctx.fillText("🌸", playerX*boxSize+2, playerY*boxSize+22);
+  }
+function getPos(e){
+  const r = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: Math.floor((cx - r.left) / boxSize),
+    y: Math.floor((cy - r.top) / boxSize)
+  };
+}
+
+function movePlayer(p){
+  if(p.x < 0 || p.x >= 10 || p.y < 0 || p.y >= 10) return;
+  if(maze[p.y][p.x] === 1) return;
+  playerX = p.x;
+  playerY = p.y;
+  drawMaze();
+  if(maze[p.y][p.x] === 2){
+    document.getElementById('winScreen').classList.add('show');
+  }
+}
+
+canvas.addEventListener('mousedown', e=>{
+  const p = getPos(e);
+  if(p.x === playerX && p.y === playerY) isDragging = true;
+});
+canvas.addEventListener('touchstart', e=>{
+  const p = getPos(e);
+  if(p.x === playerX && p.y === playerY) isDragging = true;
+}, {passive:false});
+
+canvas.addEventListener('mousemove', e=>{
+  if(!isDragging) return;
+  movePlayer(getPos(e));
+});
+canvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  if(!isDragging) return;
+  movePlayer(getPos(e));
+}, {passive:false});
+
+canvas.addEventListener('mouseup', ()=>{ isDragging = false; });
+canvas.addEventListener('touchend', ()=>{ isDragging = false; });
+canvas.addEventListener('mouseleave', ()=>{ isDragging = false; });
+
+function resetGame(){
+  playerX = 1;
+  playerY = 0;
+  document.getElementById('winScreen').classList.remove('show');
+  drawMaze();
+}
+
+drawMaze();
+</script>
+</body>
