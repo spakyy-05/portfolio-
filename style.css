@@ -47,8 +47,9 @@ html,body{
   display:inline-block;
   height:100px;
   width:100px;
-  margin-top: 5px;
+  margin-top: 8px;
   animation: float 3s infinite;
+  animation-delay:0s;
   }
 .Gif2{ 
    background-color:white;
@@ -57,9 +58,9 @@ html,body{
   margin-right:10px;
   height:100px;
   width:100px;
-  margin-top: 5px;
+  margin-top: 8px;
   animation: float 3s infinite;
-  animation-delay:1s;
+  animation-delay:1.5s;
   }
 .Gif3{
   background-color:white;
@@ -67,9 +68,9 @@ html,body{
   display:inline-block;
   height:100px;
   width:100px;
-  margin-top: 5px;
+  margin-top: 8px;
   animation: float 3s infinite;
-  animation-delay:2s;
+  animation-delay:2.5s;
   }
 .Gif1 img, .Gif2 img, .Gif3 img{
   width:100%;
@@ -112,7 +113,7 @@ html,body{
   display: flex;
   justify-content: center;
   padding-left: 0px;
-  margin-top:-20vh;
+  margin-top:-25vh;
   align-self: flex-start;
   height: auto;
   margin-bottom: 5px; /* reduce gap */
