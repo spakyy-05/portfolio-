@@ -132,21 +132,25 @@ function drawMaze(){
   }
 function getPos(e){
   const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width; // FIX for 260 vs 300
+  const scaleY = canvas.height / r.height;
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
   return {
-    x: Math.floor((cx - r.left) / boxSize),
-    y: Math.floor((cy - r.top) / boxSize)
+    x: Math.floor(((cx - r.left) * scaleX) / boxSize),
+    y: Math.floor(((cy - r.top) * scaleY) / boxSize)
   };
 }
 
 function movePlayer(p){
   if(p.x < 0 || p.x >= 10 || p.y < 0 || p.y >= 10) return;
-  if(maze[p.y][p.x] === 1) return;
+  if(maze[p.y][p.x] === 1) return; // wall
   playerX = p.x;
   playerY = p.y;
   drawMaze();
+  console.log("Moved to", p.x, p.y, "value:", maze[p.y][p.x]);
   if(maze[p.y][p.x] === 2){
+    console.log("WIN!");
     document.getElementById('winScreen').classList.add('show');
   }
 }
