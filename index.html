@@ -43,6 +43,112 @@
     <button onclick="resetGame()">Play Again</button>
   </div>
 </div>
+    <script>
+const boxes = document.querySelectorAll('.Gif1, .Gif2, .Gif3');
+boxes.forEach(box => {
+  box.style.cursor = "pointer";
+  box.addEventListener('click', function() {
+    this.classList.add('zoomed');
+    setTimeout(() => { this.classList.remove('zoomed'); }, 800);
+  });
+});
+
+const btn = document.querySelector('.btn');
+const noteContainer = document.getElementById('note-container');
+const noteEl = document.getElementById('note');
+const message = `Boom 💥😁..hluuu to u 🤗🤗 u're are good person 🥰 but only from heart cause u don't have dimaag 😜😜😜....bhagoo 😱😨💨💨..wait look down 👇`;
+let isTyping = false;
+btn.addEventListener('click', function() {
+  if(isTyping) return;
+  noteContainer.style.display = "block";
+  noteEl.textContent = "";
+  let i = 0;
+  isTyping = true;
+  function type(){
+    if(i < message.length){
+      noteEl.textContent += message.charAt(i);
+      i++;
+      setTimeout(type, 40);
+    } else {
+      isTyping = false;
+      const mazeEl = document.getElementById('mazePaper');
+      mazeEl.style.display = "block";
+      setTimeout(()=>{
+        mazeEl.classList.add('show');
+        mazeEl.scrollIntoView({behavior: "smooth"});
+      }, 400);
+    }
+  }
+  type();
+});
+
+// --- NEW MAZE - EASY MOBILE VERSION ---
+const canvas = document.getElementById('mazePaper');
+const ctx = canvas.getContext('2d');
+const boxSize = 30;
+const maze = [
+  [1,0,1,1,1,1],
+  [1,0,0,0,0,0,1,0,0,1],
+  [1,1,1,0,1,0,1,1,0,1],
+  [1,0,0,0,1,0,0,0,0,1],
+  [1,0,1,1,1,1,1,0,1,1],
+  [1,0,0,0,0,0,1,0,0,1],
+  [1,1,1,1,0,1,1,1,0,1],
+  [1,0,0,0,0,1,0,0,0,1],
+  [1,0,1,1,0,0,0,1,0,1],
+  [1,1,1,1,1,1,1,1,0,2]
+];
+let playerX = 1, playerY = 0;
+
+function drawMaze(){
+  ctx.clearRect(0,0,300,300);
+  ctx.strokeStyle = "green"; ctx.lineWidth = 3;
+  for(let y=0;y<10;y++){
+    for(let x=0;x<10;x++){
+      if(maze[y][x]===1) ctx.strokeRect(x*boxSize, y*boxSize, boxSize, boxSize);
+      if(maze[y][x]===2){ ctx.font="20px serif"; ctx.fillText("🎁", x*boxSize+2, y*boxSize+22); }
+    }
+  }
+  ctx.font="20px serif"; ctx.fillText("🌸", playerX*boxSize+2, playerY*boxSize+22);
+}
+
+function tryMove(dx,dy){
+  let nx=playerX+dx, ny=playerY+dy;
+  if(nx<0||nx>=10||ny<0||ny>=10) return;
+  if(maze[ny][nx]===1) return;
+  playerX=nx; playerY=ny; drawMaze();
+  if(maze[ny][nx]===2) setTimeout(()=>document.getElementById('winScreen').classList.add('show'),100);
+}
+
+canvas.addEventListener('click', e=>{
+  const r=canvas.getBoundingClientRect();
+  const sx=canvas.width/r.width, sy=canvas.height/r.height;
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const cy=e.touches?e.touches[0].clientY:e.clientY;
+  let x=Math.floor(((cx-r.left)*sx)/boxSize);
+  let y=Math.floor(((cy-r.top)*sy)/boxSize);
+  let dx=x-playerX, dy=y-playerY;
+  if(Math.abs(dx)<=1 && Math.abs(dy)<=1) tryMove(dx,dy);
+});
+
+let sX,sY;
+canvas.addEventListener('touchstart',e=>{sX=e.touches[0].clientX; sY=e.touches[0].clientY},{passive:false});
+canvas.addEventListener('touchend',e=>{
+  if(!sX) return;
+  let dx=e.changedTouches[0].clientX-sX, dy=e.changedTouches[0].clientY-sY;
+  if(Math.abs(dx)>Math.abs(dy)){ if(dx>20) tryMove(1,0); else if(dx<-20) tryMove(-1,0); }
+  else { if(dy>20) tryMove(0,1); else if(dy<-20) tryMove(0,-1); }
+  sX=null;
+},{passive:false});
+
+function resetGame(){ playerX=1; playerY=0; document.getElementById('winScreen').classList.remove('show'); drawMaze(); }
+drawMaze();
+
+// Add arrow buttons
+const controls=document.createElement('div');
+controls.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:12px"><div><button onclick="tryMove(0,-1)" style="padding:8px 16px;border-radius:10px;background:white;border:2px solid #4caf50">⬆️</button></div><div style="display:flex;gap:20px"><button onclick="tryMove(-1,0)" style="padding:8px 16px;border-radius:10px;background:white;border:2px solid #4caf50">⬅️</button><button onclick="tryMove(1,0)" style="padding:8px 16px;border-radius:10px;background:white;border:2px solid #4caf50">➡️</button></div><div><button onclick="tryMove(0,1)" style="padding:8px 16px;border-radius:10px;background:white;border:2px solid #4caf50">⬇️</button></div></div>`;
+document.querySelector('.button').appendChild(controls);
+  </script>
     
 <script>
 const boxes = document.querySelectorAll('.Gif1, .Gif2, .Gif3');
@@ -118,73 +224,6 @@ function drawMaze(){
   ctx.lineWidth = 3;
   for(let y=0; y<10; y++){
     for(let x=0; x<10; x++){
-      if(maze[y][x] === 1){
-        ctx.strokeRect(x*boxSize, y*boxSize, boxSize, boxSize);
-      }
-      if(maze[y][x] === 2){
-        ctx.font = "20px serif";
-        ctx.fillText("🎁", x*boxSize+2, y*boxSize+22);
-      }
-    }
-  }
-  ctx.font = "20px serif";
-  ctx.fillText("🌸", playerX*boxSize+2, playerY*boxSize+22);
-  }
-function getPos(e){
-  const r = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / r.width; // FIX for 260 vs 300
-  const scaleY = canvas.height / r.height;
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
-  return {
-    x: Math.floor(((cx - r.left) * scaleX) / boxSize),
-    y: Math.floor(((cy - r.top) * scaleY) / boxSize)
-  };
-}
+      </script>
 
-function movePlayer(p){
-  if(p.x < 0 || p.x >= 10 || p.y < 0 || p.y >= 10) return;
-  if(maze[p.y][p.x] === 1) return; // wall
-  playerX = p.x;
-  playerY = p.y;
-  drawMaze();
-  console.log("Moved to", p.x, p.y, "value:", maze[p.y][p.x]);
-  if(maze[p.y][p.x] === 2){
-    console.log("WIN!");
-    document.getElementById('winScreen').classList.add('show');
-  }
-}
-
-canvas.addEventListener('mousedown', e=>{
-  const p = getPos(e);
-  if(p.x === playerX && p.y === playerY) isDragging = true;
-});
-canvas.addEventListener('touchstart', e=>{
-  const p = getPos(e);
-  if(p.x === playerX && p.y === playerY) isDragging = true;
-}, {passive:false});
-
-canvas.addEventListener('mousemove', e=>{
-  if(!isDragging) return;
-  movePlayer(getPos(e));
-});
-canvas.addEventListener('touchmove', e=>{
-  e.preventDefault();
-  if(!isDragging) return;
-  movePlayer(getPos(e));
-}, {passive:false});
-
-canvas.addEventListener('mouseup', ()=>{ isDragging = false; });
-canvas.addEventListener('touchend', ()=>{ isDragging = false; });
-canvas.addEventListener('mouseleave', ()=>{ isDragging = false; });
-
-function resetGame(){
-  playerX = 1;
-  playerY = 0;
-  document.getElementById('winScreen').classList.remove('show');
-  drawMaze();
-}
-
-drawMaze();
-</script>
 </body>
